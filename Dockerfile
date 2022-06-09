@@ -5,7 +5,7 @@ RUN yum update -y \
     && yum install -y gzip
 
 WORKDIR /scripts
-COPY install-pg_dump.sh .
+COPY install-pg-dump.sh .
 RUN "/scripts/install-pg_dump.sh"
 
 COPY backup.sh .
