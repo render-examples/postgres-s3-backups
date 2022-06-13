@@ -6,7 +6,7 @@ RUN yum update -y \
 
 WORKDIR /scripts
 COPY install-pg-dump.sh .
-RUN "/scripts/install-pg_dump.sh"
+RUN "/scripts/install-pg-dump.sh"
 
 COPY backup.sh .
 ENTRYPOINT [ "/scripts/backup.sh" ]
