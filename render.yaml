@@ -1,7 +1,7 @@
 services:
   - name: clarity-db-backup
     type: cron
-    schedule: "0 12,4 * * *"
+    schedule: "0 11,19 * * *"
     region: oregon
     env: docker
     plan: standard
