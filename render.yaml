@@ -1,32 +1,20 @@
 services:
-  - name: backup-db
+  - name: backup-postgres
     type: cron
-    schedule: "0 3 * * *"
+    schedule: "0 0 * * *"
     region: oregon
     env: docker
     plan: standard
     dockerfilePath: ./Dockerfile
     autoDeploy: false
     envVars:
+      - key: POSTGRES_VERSION
+        value: 14
       - key: DATABASE_URL
         fromDatabase:
-          name: replace-with-your-postgres-instance-name
+          name: watershed_production_14
           property: connectionString
-      # pick the region closest to your database
-      # For example, us-west-2 for the Oregon region
-      - key: AWS_REGION
-        sync: false 
-      # A globally unique name for your bucket
-      # For example, <your-username>-<database name>-render-postgres-backups
-      - key: S3_BUCKET_NAME
-        sync: false
-      # Looks like "AKIAXXXXXXXXXXXXXXXX"
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
-      # Postgres version of your Postgres instance 
-      # For example, 14
-      - key: POSTGRES_VERSION
-        sync: false
-
+      - key: GCS_BUCKET_NAME
+        value: watershed-postgres-backups/render
+      - key: GCS_AUTH_KEY_FILE
+        value: /etc/secrets/watershed-app-259821-29491f19bd5a.json

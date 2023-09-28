@@ -1,8 +1,7 @@
-FROM amazon/aws-cli:latest
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:latest
 ARG POSTGRES_VERSION
 
-RUN yum update -y \
-    && yum install -y gzip
+RUN yum update -y && yum install -y gzip
 
 WORKDIR /scripts
 COPY install-pg-dump.sh .
