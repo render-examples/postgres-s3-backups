@@ -87,6 +87,7 @@ main() {
         download_last_backup
     fi
 
+    echo "Restoring backup to $restoration_url"
     restore_backup "$restoration_url"
 }
 
