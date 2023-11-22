@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o errexit -o nounset -o pipefail
+set -o errexit -o pipefail
 
 s3() {
     aws s3 --region "$AWS_REGION" "$@"
@@ -11,7 +11,6 @@ s3api() {
 }
 
 get_last_backup_full_key() {
-    echo "Finding last backup..."
     s3api list-objects-v2 \
         --prefix "db_backups/" \
         --query "reverse(sort_by(Contents, &Key))[0].Key" \
@@ -30,6 +29,7 @@ download_backup() {
 }
 
 download_last_backup() {
+    echo "Finding last backup..."
     local last_backup=$(get_last_backup)
     download_backup "$last_backup"
 }
@@ -47,25 +47,47 @@ restore_backup() {
 }
 
 main() {
-    if [[ $# -lt 1 || $# -gt 2 ]]; then
-        echo "Usage: $0 <restoration_url> [backup_key]"
+    if [[ $# -lt 1 || $# -gt 3 ]]; then
+        echo "Usage: $0 [-y] <restoration_url> [backup_key]"
         exit 1
     fi
 
-    read -p "Are you sure you want to proceed with the backup restoration? (y/n) " confirmation
-    if [[ $confirmation != "y" && $confirmation != "Y" ]]; then
-        echo "Operation cancelled."
-        exit 1
+    local confirm=false
+    local restoration_url
+    local backup_key
+
+    if [[ $1 == "-y" ]]; then
+        confirm=true
+        shift
     fi
 
-    if [[ $# -eq 2 ]]; then
-        download_backup "$2"
+    if [[ -z $1 ]]; then
+        echo "Error: Restoration URL is required."
+        echo "Usage: $0 [-y] <restoration_url> [backup_key]"
+    else
+        restoration_url=$1
+        shift
+    fi
+
+    if [[ -n $1 ]]; then
+        backup_key=$1
+    fi
+
+    if [[ $confirm != true ]]; then
+        read -p "Are you sure you want to proceed with the backup restoration? (y/n) " confirmation
+        if [[ $confirmation != "y" && $confirmation != "Y" ]]; then
+            echo "Operation cancelled."
+            exit 1
+        fi
+    fi
+
+    if [[ -n $backup_key ]]; then
+        download_backup "$backup_key"
     else
         download_last_backup
     fi
 
-    # Restore backup
-    restore_backup "$1"
+    restore_backup "$restoration_url"
 }
 
 main "$@"
