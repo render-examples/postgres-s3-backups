@@ -6,6 +6,7 @@ services:
     env: docker
     plan: standard
     dockerfilePath: ./Dockerfile
+    autoDeploy: false
     envVars:
       - key: DATABASE_URL
         fromDatabase:
