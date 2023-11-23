@@ -10,4 +10,5 @@ RUN "/scripts/install-pg-dump.sh"
 
 COPY backup.sh .
 COPY restore_backup.sh .
+COPY incremental_copy.sh .
 ENTRYPOINT [ "/scripts/backup.sh" ]

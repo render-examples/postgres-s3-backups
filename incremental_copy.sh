@@ -2,6 +2,8 @@
 
 set -o errexit -o pipefail
 
+PARALLEL=false
+
 copy_table() {
     local table_name="$1"
     local last_updated_at="$2"
@@ -73,12 +75,21 @@ copy_all_tables() {
 
     # Loop through other tables and call copy_table for each
     for table in $tables_with_updated_at; do
-        copy_table "$table" "$last_updated_at" "$max_created_at"
+        # if parallel:
+        if [ "$PARALLEL" = true ]; then
+            copy_table "$table" "$last_updated_at" "$max_created_at" &
+        else
+          copy_table "$table" "$last_updated_at" "$max_created_at"
+        fi
     done
+
+    if [ "$PARALLEL" = true ]; then
+        wait
+    fi
 }
 
-main() {
-    local last_updated_at="$1"
+copy_changes_since_last_run() {
+    local last_updated_at
     local current_timestamp
 
     local current_timestamp=$(date +%s)
@@ -92,22 +103,21 @@ main() {
         default_last_updated_at="$DEFAULT_START"
     fi
 
-    # if last_updated_at wasn't set or if it was invalid...
-    if ! [[ $last_updated_at =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}([ T][0-9]{2}:[0-9]{2}:[0-9]{2})?$ ]]; then
-      # Check if last_incremental_copy.txt exists and read from it
-      if [[ -f "last_incremental_copy.txt" ]]; then
-          last_updated_at=$(cat "last_incremental_copy.txt")
+    if [[ -f "last_incremental_copy.txt" ]]; then
+        last_updated_at=$(cat "last_incremental_copy.txt")
 
-          if ! [[ $last_updated_at =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}([ T][0-9]{2}:[0-9]{2}:[0-9]{2})?$ ]]; then
-              echo "last_updated_at is not a valid date or datetime string; falling back to default"
-              last_updated_at="$default_last_updated_at"
-          fi
-      else
-          last_updated_at="$default_last_updated_at"
-      fi
+        if ! [[ $last_updated_at =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}([ T][0-9]{2}:[0-9]{2}:[0-9]{2})?$ ]]; then
+            echo "last_updated_at is not a valid date or datetime string; falling back to default"
+            last_updated_at="$default_last_updated_at"
+        fi
+    else
+        last_updated_at="$default_last_updated_at"
     fi
 
     echo "Copying data since: $last_updated_at"
+    if [ "$PARALLEL" = true ]; then
+        echo "Running in parallel"
+    fi
     echo
 
     # Run the copy_all_tables function with the determined date
@@ -115,6 +125,31 @@ main() {
 
     # Write the current UTC timestamp to last_incremental_copy.txt
     echo "$current_timestamp" > "last_incremental_copy.txt"
+}
+
+main() {
+    local loop=false
+
+    for arg in "$@"; do
+        if [ "$arg" == "--loop" ]; then
+            loop=true
+        fi
+
+        # Note: parallel mode is a little spooky because there can be weird race conditions between tables given ordering constraints
+        # More testing is needed if we ever want to use this in production
+        if [ "$arg" == "--parallel" ]; then
+            PARALLEL=true
+        fi
+    done
+
+    if [ "$loop" = true ]; then
+        echo "Running in loop mode"
+        while true; do
+            copy_changes_since_last_run
+        done
+    else
+        copy_changes_since_last_run
+    fi
 }
 
 main "$@"
