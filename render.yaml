@@ -1,5 +1,5 @@
 services:
-  - name: backup-db
+  - name: sst-stickerstars-production-cron-db-s3-backup
     type: cron
     schedule: "0 3 * * *"
     region: frankfurt
