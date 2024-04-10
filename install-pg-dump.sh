@@ -22,4 +22,4 @@ gpgcheck=1
 gpgkey=https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG
 EOF
 
-yum install postgresql$POSTGRES_VERSION -y
+yum install postgresql$POSTGRES_VERSION-server -y
