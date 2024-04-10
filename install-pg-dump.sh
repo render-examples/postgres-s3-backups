@@ -16,9 +16,10 @@ fi
 cat <<EOF > /etc/yum.repos.d/pgdg.repo
 [pgdg$POSTGRES_VERSION]
 name=PostgreSQL $POSTGRES_VERSION for RHEL/CentOS 7 - x86_64
-baseurl=http://download.postgresql.org/pub/repos/yum/$POSTGRES_VERSION/redhat/rhel-7-x86_64
+baseurl=https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/
 enabled=1
-gpgcheck=0
+gpgcheck=1
+gpgkey=https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG
 EOF
 
 yum install postgresql$POSTGRES_VERSION -y
