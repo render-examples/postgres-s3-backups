@@ -15,8 +15,8 @@ fi
 
 # if POSTGRES_VERSION is 16:
 if [[ "$POSTGRES_VERSION" == 16 ]]; then
-  dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-  dnf install -y postgresql16
+  yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  yum install postgresql$POSTGRES_VERSION -y
   exit 0
 fi
 
@@ -28,4 +28,4 @@ enabled=1
 gpgcheck=0
 EOF
 
-yum install postgresql$POSTGRES_VERSION-server -y
+yum install postgresql$POSTGRES_VERSION -y
