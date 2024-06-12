@@ -1,5 +1,5 @@
 # Accept PostgreSQL version as an argument
-ARG POSTGRES_VERSION=12
+ARG POSTGRES_VERSION
 FROM postgres:${POSTGRES_VERSION}
 
 # Set the working directory
