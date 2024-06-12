@@ -1,14 +1,21 @@
-FROM amazon/aws-cli:latest
-ARG POSTGRES_VERSION
+# Accept PostgreSQL version as an argument
+ARG POSTGRES_VERSION=12
+FROM postgres:${POSTGRES_VERSION}
 
-RUN yum update -y \
-    && yum install -y gzip
-
+# Set the working directory
 WORKDIR /scripts
-COPY install-pg-dump.sh .
-RUN "/scripts/install-pg-dump.sh"
 
+# Copy your scripts into the container
 COPY backup.sh .
 COPY restore_backup.sh .
 COPY incremental_copy.sh .
+COPY install-pg-dump.sh .
+
+# Ensure the scripts have execution permissions
+RUN chmod +x backup.sh restore_backup.sh incremental_copy.sh install-pg-dump.sh
+
+# Install necessary tools
+RUN apt-get update && apt-get install -y awscli
+
+# Set the entrypoint to your backup script
 ENTRYPOINT [ "/scripts/backup.sh" ]
