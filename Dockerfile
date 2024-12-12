@@ -1,12 +1,10 @@
-FROM amazon/aws-cli:latest
+ARG ALPINE_VERSION
+FROM alpine:${ALPINE_VERSION} as alpine
+
 ARG POSTGRES_VERSION
-
-RUN yum update -y \
-    && yum install -y gzip
-
+RUN apk add --no-cache postgresql$POSTGRES_VERSION-client \
+      aws-cli
 WORKDIR /scripts
-COPY install-pg-dump.sh .
-RUN "/scripts/install-pg-dump.sh"
 
 COPY backup.sh .
-ENTRYPOINT [ "/scripts/backup.sh" ]
+ENTRYPOINT [ "sh", "backup.sh" ]
