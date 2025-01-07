@@ -1,16 +1,16 @@
 services:
   - name: backup-db
     type: cron
-    schedule: "0 3 * * *"
-    region: oregon
+    schedule: "0 4 * * *"
+    region: ohio
     env: docker
     plan: standard
     dockerfilePath: ./Dockerfile
     autoDeploy: false
     envVars:
-      - key: DATABASE_URL
+      - key: postgresql://db_dvg6_user:hLxqMOMX1yQ9HmNndeM7UDimCGaEmG8X@dpg-cdl4clkgqg43pc58b18g-a/db_dvg6
         fromDatabase:
-          name: replace-with-your-postgres-instance-name
+          name: db
           property: connectionString
       # pick the region closest to your database
       # For example, us-west-2 for the Oregon region
