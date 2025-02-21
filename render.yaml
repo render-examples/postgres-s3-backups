@@ -10,27 +10,24 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: replace-with-your-postgres-instance-name
+          name: platform-db-application-prod
           property: connectionString
-      # pick the region closest to your database
-      # For example, us-west-2 for the Oregon region
       - key: AWS_REGION
-        sync: false 
-      # A globally unique name for your bucket
-      # For example, <your-username>-<database name>-render-postgres-backups
-      - key: S3_BUCKET_NAME
+        value: "us-west-2"
         sync: false
-      # Looks like "AKIAXXXXXXXXXXXXXXXX"
+      - key: S3_BUCKET_NAME
+        value: instil-render-prod-database-backups
+        sync: false
       - key: AWS_ACCESS_KEY_ID
+        value: ${{ secrets.AWS_ACCESS_KEY_ID }}
         sync: false
       - key: AWS_SECRET_ACCESS_KEY
+        value: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         sync: false
-      # Postgres version of your Postgres instance 
-      # For example, 16
       - key: POSTGRES_VERSION
+        value: 16
         sync: false
-      # Alpine base-OS version, see README
-      # For example, 3.20
       - key: ALPINE_VERSION
+        value: 3.20
         sync: false
 
