@@ -8,6 +8,8 @@ You'll need to set corresponding OS and Postgres versions:
 
 | `POSTGRES_VERSION` | `ALPINE_VERSION` |
 | :----------------: | :--------------: |
+| 18                 | 3.23             |
+| 17                 | 3.21             |
 | 16                 | 3.20             |
 | 15                 | 3.20             |
 | 14                 | 3.20             |
